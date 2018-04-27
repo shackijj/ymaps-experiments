@@ -9,46 +9,13 @@
         <title></title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+        <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&load=Map" type="text/javascript"></script>
     </head>
     <body>
         <div id="map" style="width: 600px; height: 400px"></div>
-        <script type="text/javascript">
-            ymaps.ready(init);
-            var myMap,
-                myGeoObjects;
-
-            function init() {
-                myMap = new ymaps.Map("map", {
-                    center: [55.76, 37.64], 
-                    zoom: 7
-                });
-                myGeoObjects = [];
-                myGeoObjects[0] = new ymaps.GeoObject({
-                    geometry: { type: "Point", coordinates: [56.034, 36.992] },
-                    properties: {
-                        clusterCaption: 'Геообъект №1',
-                        balloonContentBody: 'Содержимое балуна геообъекта №1.'
-                    }
-                });
-                myGeoObjects[1] = new ymaps.GeoObject({
-                    geometry: { type: "Point", coordinates: [56.021, 36.983] },
-                    properties: {
-                        clusterCaption: 'Геообъект №2',
-                        balloonContentBody: 'Содержимое балуна геообъекта №2.'
-                    }
-                });
-                
-                // Создадим кластеризатор и запретим приближать карту при клике на кластеры.
-                var clusterer = new ymaps.Clusterer({ clusterDisableClickZoom: true });
-                clusterer.add(myGeoObjects);
-                myMap.geoObjects.add(clusterer);
-            }
-
-        </script>
+        <script src="map.js" type="text/javascript"></script>
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-        
     </body>
 </html>
