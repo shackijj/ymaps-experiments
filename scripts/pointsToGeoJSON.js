@@ -1,0 +1,1 @@
+Object.entries(points).map(([key, value], idx) => ({type: "Feature", id: idx, geometry: {type: "Point", coordinates: [parseFloat(key.split(', ')[0]), parseFloat(key.split(', ')[1])]}, data: value}))
