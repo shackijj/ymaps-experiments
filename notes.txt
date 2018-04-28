@@ -1,1 +1,7 @@
 Use ObjectManager because it's has better performance. https://tech.yandex.ru/maps/doc/jsapi/2.1/dg/concepts/many-objects-docpage/
+
+Layer
+util.PrTree
+util.hd
+defineClass
+util.bounds
