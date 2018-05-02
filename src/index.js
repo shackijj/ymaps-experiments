@@ -1,160 +1,103 @@
-var data = require('../data/points-geojson.json');
+ymaps.modules.require(['Map', 'Polygon'], function (Map, Polygon) {
+    ymaps.Map = Map;
+    ymaps.Polygon = Polygon;
 
-ymaps.ready({
-    require: ['ShapeLayer'],
+    drawHexagones();
 
-    successCallback: () => {
-        buildGrid(data);
-        // buildFixedGrid(data);
-        // buildFlexGrid(data);
+    function drawSquares() {
+        var SQUARE_WIDTH = 15;
         
-        /*        
-        function buildFixedGrid (data) {
-            var map = new ymaps.Map('map', {
-                    center: [37.6, 55.75],
-                    zoom: 8
-                }, {
-                    avoidFractionalZoom: false
-                }),
-                heatmap = new ymaps.ShapeLayer(
-                    data,
-                    {
-                        shapeForm: 'circles',
-                            clusterize: true,
-                            centroidMode: 'float',
-                            gridSize: Math.pow(2, -4),
-                            fillColor: function (cluster, zoom) {
-                            return 'rgba(40, 80 ,40, 0.4)';
-                        },
-                        size: function (cluster, zoom) {
-                            var weight = cluster.objects.reduce((counter, object) => {
-                                    return counter + object.properties.weight;
-                        }, 0);
-                            return weight / (300 * Math.pow(2, 13 - zoom));
-                        }
-                    });
-
-                    map.layers.add(heatmap);
-
-                    map.events.add('click', (e) => {
-                            var objects = heatmap.getObjectsInPosition(e.get('coords'));
-                        if (objects.length) {
-                            map.balloon.open(
-                                objects[0].geometry.coordinates,
-                                '<pre>' + JSON.stringify(objects, null, 4) + '</pre>'
-                            );
-                        }
-                    });
-        } 
-        */
-        /* 
-        function buildFlexGrid (data) {
-            var map = new ymaps.Map('map_flex_grid', {
-                    center: [37.6, 55.75],
-                    zoom: 8
-                }, {
-                    avoidFractionalZoom: false
-                }),
-                heatmap = new ymaps.ShapeLayer(
-                    data, 
-                    {
-                        shapeForm: 'circles',
-                            clusterize: true,
-                            gridMode: 'flexible',
-                            gridSize: function (zoom) {
-                            return Math.pow(1.5, zoom - 2);
-                        },
-                        fillColor: function (cluster) {
-                            var weight = cluster.objects.reduce((counter, object) => {
-                                    return counter + object.properties.weight;
-                        }, 0);
-                            return 'rgba(40,' +
-                                Math.min(Math.round(weight / 50), 255) +
-                                ',40,0.3)';
-                        }
-                    });
-
-                    map.layers.add(heatmap);
-
-                    map.events.add('click', (e) => {
-                        var objects = heatmap.getObjectsInPosition(e.get('coords'));
-                    if (objects.length) {
-                        map.balloon.open(
-                            objects[0].geometry.coordinates,
-                            '<pre>' + JSON.stringify(objects, null, 4) + '</pre>'
-                        );
-                    }
+        var el = document.getElementById('map');
+    
+        var map = new ymaps.Map(el, { 
+            center: [55.76, 37.64], 
+            zoom: 10
+        });
+    
+        var zoom = map.getZoom();
+        var projection = map.options.get('projection');
+    
+        var rect = el.getBoundingClientRect();
+        var cols = rect.width / SQUARE_WIDTH;
+        var rows = rect.height / SQUARE_WIDTH;
+        var center = map.getGlobalPixelCenter();
+    
+        var offsetLeft = center[0] - (rect.width / 2);
+        var offsetTop = center[1] - (rect.height / 2);
+    
+        for (var r = 0; r < rows; r++) {
+            for(var c = 0; c < cols; c++) {
+                var left = offsetLeft + (c * SQUARE_WIDTH);
+                var top = offsetTop + (r * SQUARE_WIDTH);
+                var right = left + SQUARE_WIDTH;
+                var bottom = top + SQUARE_WIDTH;
+                var squarePixels = [[left, top], [right, top], [right, bottom], [left, bottom]];
+                var squareGlobals = squarePixels.map(function(point) {
+                    var result = projection.fromGlobalPixels(point, zoom);
+                    return result;
                 });
-            } */
-            
-            function buildGrid (data) {
-                var map = new ymaps.Map('map', {
-                        center: [55.76, 37.64], 
-                        zoom: 10
-                    }, {
-                        avoidFractionalZoom: false
-                    }),
-                    shapeLayer = new ymaps.ShapeLayer(
-                        data, 
-                        {
-                            shapeForm: 'squares',
-                            clusterize: true,
-                            gridSize: 27 * Math.pow(2, -11),
-                            fillColor: function (cluster) {
-                                var weight = cluster.objects.reduce((counter, object) => {
-                                    return counter + object.properties.weight;
-                                }, 0);
-                                return 'rgba(0,' + Math.min(Math.round(weight / 15), 255) + ',0,0.3)';
-                            }
-                    });
-
-                    map.layers.add(shapeLayer);
-
-                    map.events.add('click', (e) => {
-                        var objects = shapeLayer.getObjectsInPosition(e.get('coords'));
-                        if (objects.length) {
-                            map.balloon.open(
-                                objects[0].geometry.coordinates,
-                                '<pre>' + JSON.stringify(objects, null, 4) + '</pre>'
-                            );
-                        }
-                    });
+                var polygon = new ymaps.Polygon([
+                    squareGlobals
+                ], {
+                    hintContent: "Многоугольник"
+                }, {
+                    fillColor: '#6699ff',
+                    interactivityModel: 'default#transparent',
+                    strokeWidth: 1 ,
+                    opacity: 0.5
+                });
+                map.geoObjects.add(polygon);
             }
-            /* 
-            function buildCircles (data) {
-                    var map = new ymaps.Map('map_circles', {
-                            center: [37.6, 55.75],
-                            zoom: 10
-                        }, {
-                            avoidFractionalZoom: false
-                        }),
-                        heatmap = new ymaps.ShapeLayer(data.features.map((feature) => {
-                                return {
-                                    type: 'Feature',
-                                    geometry: feature.geometry,
-                                    properties: Object.assign({}, feature.properties, {
-                                        weight: Number(feature.properties.stat[0][9])
-                                    })
-                                };
-                        }), {
-                            shapeForm: 'circles',
-                                fillColor: 'rgba(50, 150, 50, 0.6)',
-                                size: function (feature, zoom) {
-                                return feature.properties.weight * Math.pow(1.4, zoom - 12);
-                            }
-                        });
-
-                        map.layers.add(heatmap);
-
-                        map.events.add('click', (e) => {
-                            var objects = heatmap.getObjectsInPosition(e.get('coords'));
-                        if (objects.length) {
-                            map.balloon.open(
-                                objects[0].geometry.coordinates,
-                                '<pre>' + JSON.stringify(objects, null, 4) + '</pre>'
-                            );
-                        }
-                });
-            } */
+        }
     }
-});
+
+    function drawHexagones() {
+        var R = 20;
+        
+        var el = document.getElementById('map');
+    
+        var map = new ymaps.Map(el, { 
+            center: [55.76, 37.64], 
+            zoom: 10
+        });
+    
+        var zoom = map.getZoom();
+        var projection = map.options.get('projection');
+    
+        var rect = el.getBoundingClientRect();
+        var center = map.getGlobalPixelCenter();
+    
+        var offsetLeft = center[0] - (rect.width / 2);
+        var offsetTop = center[1] - (rect.height / 2);
+
+        const SIXTY_DEG_IN_RADS = Math.PI * 60 / 180;
+        const COS_OF_SIXTY = Math.cos(SIXTY_DEG_IN_RADS);
+        const SIN_OF_SIXTY = Math.sin(SIXTY_DEG_IN_RADS);
+        var hexagon = [
+            [R, 0],
+            [R * COS_OF_SIXTY, R * SIN_OF_SIXTY],
+            [0 - R * COS_OF_SIXTY, R * SIN_OF_SIXTY],
+            [0 - R, 0],
+            [0 - R * COS_OF_SIXTY, 0 - R * SIN_OF_SIXTY],
+            [R * COS_OF_SIXTY, 0 - R * SIN_OF_SIXTY],
+        ];
+
+        var hexagonGlobals = hexagon.map(function(point) {
+            var result = projection.fromGlobalPixels([offsetLeft + point[0], offsetTop + point[1]], zoom);
+            return result;
+        });
+
+        var polygon = new ymaps.Polygon([
+            [],
+            hexagonGlobals
+        ], {
+            hintContent: "Многоугольник"
+        }, {
+            fillColor: '#6699ff',
+            interactivityModel: 'default#transparent',
+            strokeWidth: 1 ,
+            opacity: 0.5
+        });
+        map.geoObjects.add(polygon);
+    }
+})
