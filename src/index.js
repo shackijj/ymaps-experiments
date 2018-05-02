@@ -52,13 +52,13 @@ ymaps.modules.require(['Map', 'Polygon'], function (Map, Polygon) {
     }
 
     function drawHexagones() {
-        var R = 15;
+        var R = 20;
         
         var el = document.getElementById('map');
     
         var map = new ymaps.Map(el, { 
             center: [55.76, 37.64], 
-            zoom: 5
+            zoom: 10
         });
     
         var zoom = map.getZoom();
