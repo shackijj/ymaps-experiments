@@ -52,13 +52,13 @@ ymaps.modules.require(['Map', 'Polygon'], function (Map, Polygon) {
     }
 
     function drawHexagones() {
-        var R = 20;
+        var R = 15;
         
         var el = document.getElementById('map');
     
         var map = new ymaps.Map(el, { 
             center: [55.76, 37.64], 
-            zoom: 10
+            zoom: 5
         });
     
         var zoom = map.getZoom();
@@ -76,7 +76,7 @@ ymaps.modules.require(['Map', 'Polygon'], function (Map, Polygon) {
 
         var colWidth = 1.5 * R;
         var rowHeight = 1.5 * R;
-        var cols = Math.floor(rect.width / colWidth) + 1;
+        var cols = Math.floor((rect.width + (R / 2)) / colWidth) + 1;
         var rows = Math.floor(rect.height / rowHeight);
 
         function sin(angle) {
@@ -100,7 +100,6 @@ ymaps.modules.require(['Map', 'Polygon'], function (Map, Polygon) {
                     [cos(240) + x, sin(240) + y],
                     [cos(300) + x, sin(300) + y],
                 ];
-                console.log(hexagon);
                 var hexagonGlobals = hexagon.map(function(point) {
                     return projection.fromGlobalPixels([offsetLeft + (point[0] * R), offsetTop + (point[1] * R)], zoom);
                 });
