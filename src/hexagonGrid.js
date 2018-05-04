@@ -39,6 +39,7 @@ function hexagonGrid(map, zoom, R, offsetLeft, offsetTop, width, height) {
                 [cos(180) + x, sin(180) + y],
                 [cos(240) + x, sin(240) + y],
                 [cos(300) + x, sin(300) + y],
+                [cos(0) + x, sin(0) + y],
             ];
             var hexagonGlobals = hexagon
                 .map(function(point) {
@@ -50,18 +51,14 @@ function hexagonGrid(map, zoom, R, offsetLeft, offsetTop, width, height) {
 
             result.features.push({
                 type: 'Feature',
-                id: id++,
+                id: 'hxg' + id++,
                 geometry: {
                     type: 'Polygon',
                     coordinates: [
                         hexagonGlobals
                     ],
                 },
-                options: {
-                    opacity: 0.2,
-                    strokeWidth: 2,
-                    fillColor: '#00FF00',
-                }
+                properties: {}
             });
         }
     }

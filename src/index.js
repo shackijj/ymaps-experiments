@@ -3,11 +3,11 @@ require('mapsapi-polygonmap');
 var hexagonGrid = require('./hexagonGrid.js');
 var points = require('../data/points-geojson');
 
-ymaps.modules.require(['Map', 'Polygonmap'], function (Map, Polygonmap) {
+ymaps.modules.require(['Map', 'Polygonmap', 'Polygon'], function (Map, Polygonmap, Polygon) {
     ymaps.Map = Map;
     ymaps.Polygonmap = Polygonmap;
 
-    var R = 20;
+    var R = 25;
     
     var el = document.getElementById('map');
 
@@ -28,6 +28,8 @@ ymaps.modules.require(['Map', 'Polygonmap'], function (Map, Polygonmap) {
         polygons: hexagonGrid(map, zoom, R, offsetLeft, offsetTop, rect.width, rect.height),
         points: points,
     };
+
     var polygonmap = new Polygonmap(data);
+    
     polygonmap.setMap(map);
 });
