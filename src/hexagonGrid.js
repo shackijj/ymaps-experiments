@@ -40,9 +40,13 @@ function hexagonGrid(map, zoom, R, offsetLeft, offsetTop, width, height) {
                 [cos(240) + x, sin(240) + y],
                 [cos(300) + x, sin(300) + y],
             ];
-            var hexagonGlobals = hexagon.map(function(point) {
-                return projection.fromGlobalPixels([offsetLeft + (point[0] * R), offsetTop + (point[1] * R)], zoom);
-            });
+            var hexagonGlobals = hexagon
+                .map(function(point) {
+                    return projection.fromGlobalPixels([offsetLeft + (point[0] * R), offsetTop + (point[1] * R)], zoom);
+                })
+                .map(function(coords) {
+                    return [coords[1], coords[0]];
+                });
 
             result.features.push({
                 type: 'Feature',
@@ -57,7 +61,6 @@ function hexagonGrid(map, zoom, R, offsetLeft, offsetTop, width, height) {
                     opacity: 0.2,
                     strokeWidth: 2,
                     fillColor: '#00FF00',
-                    visible: true,
                 }
             });
         }
